@@ -1,0 +1,43 @@
+version: '2.1'
+
+services:
+  nightscout:
+    image: jason.com/nightscout:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    expose:
+      - 1337
+    ports:
+      - 1337:1337
+    volumes:
+      - .:/opt/app
+    depends_on:
+      - mongodb
+    environment:
+      - PORT=1337
+      - MONGO_CONNECTION=mongodb://mongodb:27017/nightscout-local
+      - INSECURE_USE_HTTP=true
+      - API_SECRET=1234567890abc
+  mongodb:
+    image: mongo:4.0
+    command:
+    - --bind_ip
+    - '0.0.0.0'
+    # Hide spammy logs
+    # To view these on `the your computer` comment these log lines
+    # and it will stream logs to console
+    - '--logpath'
+    - '/dev/null'
+    expose:
+    - 27017
+    ports:
+    - 27017:27017
+    volumes:
+    - ~/.unu/commerce/v3/db:/data/db
+    healthcheck:
+      test: echo 'db.stats().ok' | mongo
+      # --username admin --password password --authenticationDatabase='admin' --ssl --sslPEMKeyFile /certs/ca.pem --sslCAFile /certs/ca.pem --sslAllowInvalidHostnames
+      interval: 10s
+      timeout: 5s
+      retries: 5
