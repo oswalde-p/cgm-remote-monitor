@@ -1,6 +1,6 @@
 'use strict';
 
-const http = require('http')
+const http = require('http') // require('https') to work with TLS
 const crypto = require('crypto')
 
 const env = {
